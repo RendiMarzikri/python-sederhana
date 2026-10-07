@@ -2,7 +2,7 @@ from flask import Flask, Response
 
 app = Flask(__name__)
 
-app.route("/")
+@app.route("/")
 def home():
     return """<!DOCTYPE html>
 <html lang="id">
@@ -19,7 +19,7 @@ def home():
 </body>
 <html>"""
 
-app.route("/css/style.css")
+@app.route("/css/style.css")
 def css():
   return Response("""* {
   box-sizing: border-box;
