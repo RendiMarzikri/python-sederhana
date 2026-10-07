@@ -4,4 +4,5 @@
 <p>File modul:</p>
 <ul>
   <li>rendi.py</li>
+  <li>luas_persegi_panjang.py</li>
 </ul>
