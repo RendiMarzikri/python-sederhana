@@ -4,4 +4,4 @@ panjang = int(input("Masukkan panjang: "))
 lebar = int(input("Masukkan lebar: "))
 
 luas = tentukan.luas_persegi_panjang(panjang, lebar)
-print(luas)
+print("Luas persegi panjang adalah:", luas)
