@@ -5,7 +5,7 @@ def home():
     return render_template("index.html")
 @app.route("/css/style.css")
 def css():
-    return Response("body{font-family:Arial;background:#111;color:white;text-align:center;padding:50px}button{padding:10px}", content_type="text/css")
+    return Response("body{font-family:Arial;background:#111;color:white;text-align:center;padding:50px}button{padding:10px}a{color:#3498db;text-decoration:none;cursor:pointer;}a:hover{text-decoration:underline;}", content_type="text/css")
 @app.route("/api")
 def api():
     return {"status": "success", "message": "Flask berjalan!"}
