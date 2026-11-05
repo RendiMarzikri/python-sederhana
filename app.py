@@ -3,6 +3,9 @@ app = Flask(__name__, template_folder="template")
 @app.route("/")
 def home():
     return render_template("index.html")
+@app.route("/")
+def shiny():
+    return render_template("gl_web.html")
 @app.route("/css/style.css")
 def css():
     return Response("body{font-family:Arial;background:#111;color:white;text-align:center;padding:50px}button{padding:10px}a{color:#3498db;text-decoration:none;cursor:pointer;}a:hover{text-decoration:underline;}", content_type="text/css")
