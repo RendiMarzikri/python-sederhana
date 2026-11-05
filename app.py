@@ -3,7 +3,7 @@ app = Flask(__name__, template_folder="template")
 @app.route("/")
 def home():
     return render_template("index.html")
-@app.route("/")
+@app.route("/glweb")
 def shiny():
     return render_template("gl_web.html")
 @app.route("/css/style.css")
