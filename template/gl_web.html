@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="id"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"><title>Shiny Pyramid 3D - By Rendi Marzikri</title><style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{overflow:hidden;background:#888;font-family:Arial,sans-serif}
+canvas{display:block}
+#info{position:fixed;top:15px;left:15px;color:white;font-size:13px;text-shadow:0 1px 4px #444;pointer-events:none}
+#controls{position:fixed;bottom:25px;left:50%;transform:translateX(-50%);display:none;grid-template-columns:55px 55px 55px;grid-template-rows:55px 55px;gap:6px}
+.btn{background:#ffffff55;border:1px solid #ffffff99;border-radius:12px;color:white;font-size:23px;display:flex;align-items:center;justify-content:center;touch-action:none;user-select:none}
+.btn:active{background:#ffffff99}
+.up{grid-column:2;grid-row:1}
+.left{grid-column:1;grid-row:2}
+.down{grid-column:2;grid-row:2}
+.right{grid-column:3;grid-row:2}</style></head><body><div id="info">SHINY PYRAMID 3D - By Rendi Marzikri<br>Explore the unknown.</div><div id="controls">
+<div class="btn up" data-key="ArrowUp">▲</div>
+<div class="btn left" data-key="ArrowLeft">◀</div>
+<div class="btn down" data-key="ArrowDown">▼</div>
+<div class="btn right" data-key="ArrowRight">▶</div></div>
+<script type="module">
+import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js';
+const scene=new THREE.Scene();
+scene.background=new THREE.Color(0x888888);
+scene.fog=new THREE.Fog(0x888888,18,100);
+const camera=new THREE.PerspectiveCamera(65,innerWidth/innerHeight,0.1,250);
+camera.position.set(0,2.5,9);
+const renderer=new THREE.WebGLRenderer({antialias:true});
+renderer.setSize(innerWidth,innerHeight);
+renderer.setPixelRatio(Math.min(devicePixelRatio,2));
+renderer.toneMapping=THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure=1.5;
+document.body.appendChild(renderer.domElement);
+scene.add(new THREE.AmbientLight(0xffffff,1.2));
+const light=new THREE.DirectionalLight(0xffffff,4);
+light.position.set(5,10,7);
+scene.add(light);
+const point=new THREE.PointLight(0x99ccff,35,30);
+point.position.set(-4,5,3);
+scene.add(point);
+const floor=new THREE.Mesh(
+  new THREE.PlaneGeometry(2000,2000),
+  new THREE.MeshStandardMaterial({color:0x888888,roughness:1})
+);
+floor.rotation.x=-Math.PI/2;
+floor.position.y=-1.5;
+scene.add(floor);
+const geometry=new THREE.ConeGeometry(2,3,4);
+geometry.rotateY(Math.PI/4);
+const material=new THREE.MeshPhysicalMaterial({
+  color:0xddeeff,
+  metalness:0.95,
+  roughness:0.12,
+  clearcoat:1,
+  clearcoatRoughness:0.05
+});
+const pyramid=new THREE.Mesh(geometry,material);
+pyramid.position.y=0;
+scene.add(pyramid);
+const sparkleGeometry=new THREE.BufferGeometry();
+const sparklePositions=[];
+for(let i=0;i<500;i++){
+  sparklePositions.push(
+    (Math.random()-.5)*15,
+    Math.random()*12-2,
+    (Math.random()-.5)*15
+  );
+}
+sparkleGeometry.setAttribute(
+  'position',
+  new THREE.Float32BufferAttribute(sparklePositions,3)
+);
+const sparkles=new THREE.Points(
+  sparkleGeometry,
+  new THREE.PointsMaterial({
+    color:0xffffff,
+    size:0.055,
+    transparent:true,
+    opacity:0.8
+  })
+);
+scene.add(sparkles);
+const isMobile=matchMedia('(pointer:coarse)').matches||navigator.maxTouchPoints>0;
+const controls=document.getElementById('controls');
+if(isMobile)controls.style.display='grid';
+const keys={};
+let yaw=0;
+const speed=0.12;
+const turnSpeed=0.035;
+addEventListener('keydown',e=>{
+  if(e.key.startsWith('Arrow'))e.preventDefault();
+  keys[e.key]=true;
+});
+addEventListener('keyup',e=>{
+  keys[e.key]=false;
+});
+addEventListener('blur',()=>{
+  Object.keys(keys).forEach(k=>keys[k]=false);
+});
+document.querySelectorAll('.btn').forEach(btn=>{
+  const key=btn.dataset.key;
+  btn.addEventListener('pointerdown',e=>{
+    e.preventDefault();
+    keys[key]=true;
+    btn.setPointerCapture(e.pointerId);
+  });
+  const release=()=>{
+    keys[key]=false;
+  };
+  btn.addEventListener('pointerup',release);
+  btn.addEventListener('pointercancel',release);
+  btn.addEventListener('lostpointercapture',release);
+});
+function updateMovement(){
+  if(keys.ArrowLeft)yaw+=turnSpeed;
+  if(keys.ArrowRight)yaw-=turnSpeed;
+  const forward=new THREE.Vector3(
+    -Math.sin(yaw),
+    0,
+    -Math.cos(yaw)
+  );
+  if(keys.ArrowUp)camera.position.addScaledVector(forward,speed);
+  if(keys.ArrowDown)camera.position.addScaledVector(forward,-speed);
+  camera.rotation.set(0,yaw,0);
+  camera.position.y=2.5;
+}
+const clock=new THREE.Clock();
+function animate(){
+  requestAnimationFrame(animate);
+  const t=clock.getElapsedTime();
+  pyramid.rotation.y=t*0.25;
+  sparkles.rotation.y=t*0.025;
+  material.emissive.setHex(0x111827);
+  material.emissiveIntensity=0.4+Math.sin(t*3)*0.2;
+  updateMovement();
+  renderer.render(scene,camera);
+}
+animate();
+addEventListener('resize',()=>{
+  camera.aspect=innerWidth/innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(innerWidth,innerHeight);
+});</script></body></html>
